@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"math/rand"
+	"net/http"
 	"sort"
 	"testing"
 	"time"
@@ -12,6 +14,9 @@ import (
 var _ = check.Suite(&sortTestSuite{})
 
 func TestT(t *testing.T) {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	check.TestingT(t)
 }
 
@@ -34,6 +39,15 @@ func (s *sortTestSuite) TestMergeSort(c *check.C) {
 		copy(expect, src)
 		MergeSort(src)
 		sort.Slice(expect, func(i, j int) bool { return expect[i] < expect[j] })
+		print("src")
+		for i := 0; i < len(src); i++ {
+			println(src[i])
+		}
+
+		print("expect")
+		for i := 0; i < len(src); i++ {
+			println(expect[i])
+		}
 		for i := 0; i < len(src); i++ {
 			c.Assert(src[i], check.Equals, expect[i])
 		}
