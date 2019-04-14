@@ -2,25 +2,34 @@ package main
 
 import "sync"
 
+var SLICE_MIN_SIZE = 3000
+
 // MergeSort performs the merge sort algorithm.
 // Please supplement this function to accomplish the home work.
 func MergeSort(src []int64) {
 	if len(src) > 1 {
 		middle := len(src) / 2
 		var wg sync.WaitGroup
-		wg.Add(2)
 
-		go func() {
-			defer wg.Done()
+		if len(src) >= SLICE_MIN_SIZE {
+			wg.Add(2)
+
+			go func() {
+				defer wg.Done()
+				MergeSort(src[:middle])
+			}()
+
+			go func() {
+				defer wg.Done()
+				MergeSort(src[middle:])
+			}()
+
+			wg.Wait()
+		} else {
 			MergeSort(src[:middle])
-		}()
-
-		go func() {
-			defer wg.Done()
 			MergeSort(src[middle:])
-		}()
+		}
 
-		wg.Wait()
 		merge(src, middle)
 	}
 }
