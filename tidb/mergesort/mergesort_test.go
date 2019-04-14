@@ -39,15 +39,7 @@ func (s *sortTestSuite) TestMergeSort(c *check.C) {
 		copy(expect, src)
 		MergeSort(src)
 		sort.Slice(expect, func(i, j int) bool { return expect[i] < expect[j] })
-		print("src")
-		for i := 0; i < len(src); i++ {
-			println(src[i])
-		}
 
-		print("expect")
-		for i := 0; i < len(src); i++ {
-			println(expect[i])
-		}
 		for i := 0; i < len(src); i++ {
 			c.Assert(src[i], check.Equals, expect[i])
 		}

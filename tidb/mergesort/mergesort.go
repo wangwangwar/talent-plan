@@ -1,12 +1,26 @@
 package main
 
+import "sync"
+
 // MergeSort performs the merge sort algorithm.
 // Please supplement this function to accomplish the home work.
 func MergeSort(src []int64) {
 	if len(src) > 1 {
 		middle := len(src) / 2
-		MergeSort(src[:middle])
-		MergeSort(src[middle:])
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		go func() {
+			defer wg.Done()
+			MergeSort(src[:middle])
+		}()
+
+		go func() {
+			defer wg.Done()
+			MergeSort(src[middle:])
+		}()
+
+		wg.Wait()
 		merge(src, middle)
 	}
 }
