@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-var SLICE_MIN_SIZE = 100
+var SLICE_MIN_SIZE = 1000
 
 // MergeSort performs the merge sort algorithm.
 // Please supplement this function to accomplish the home work.
@@ -31,8 +31,8 @@ func MergeSort(src []int64) {
 	wg.Wait()
 
 	dst := make([]int64, len(src))
-
 	parallelMerge(src, 0, middle-1, middle, len(src)-1, dst, 0)
+	//merge(src, dst, 0, middle, middle, len(src), 0)
 	copy(src, dst)
 }
 
@@ -47,34 +47,39 @@ func insertSort(src []int64) {
 	}
 }
 
-func merge(src []int64, middle int) {
-	r := make([]int64, 0, len(src))
-	i, j := 0, middle
-	for i < middle && j < len(src) {
+func merge(src []int64, dst []int64, aStart int, aEnd int, bStart int, bEnd int, dStart int) {
+	i, j := aStart, bStart
+	d := 0
+	for  i < aEnd && j < bEnd {
 		if src[i] < src[j] {
-			r = append(r, src[i])
+			dst[dStart + d] = src[i]
 			i++
+
 		} else {
-			r = append(r, src[j])
+			dst[dStart + d] = src[j]
 			j++
 		}
+		d++
 	}
 
-	if i == middle {
-		r = append(r, src[j:]...)
+	for i < aEnd {
+		dst[dStart + d] = src[i]
+		d++
+		i++
 	}
 
-	if j == len(src) {
-		r = append(r, src[i:middle]...)
+	for j < bEnd {
+		dst[dStart + d] = src[j]
+		d++
+		j++
 	}
 
-	copy(src, r)
 }
-
 
 func parallelMerge(src []int64, p1 int, r1 int, p2 int, r2 int, dst []int64, p3 int) {
 	length1 := r1 - p1 + 1
 	length2 := r2 - p2 + 1
+
 	if length1 < length2 {
 		p1, p2 = p2, p1
 		r1, r2 = r2, r1
@@ -83,6 +88,12 @@ func parallelMerge(src []int64, p1 int, r1 int, p2 int, r2 int, dst []int64, p3 
 	if length1 == 0 {
 		return
 	}
+
+	if length1 < 16 {
+		merge(src, dst, p1, r1+1, p2, r2+1, p3)
+		return
+	}
+
 	q1 := (p1 + r1) / 2
 	q2 := binarySearch(src[q1], src, p2, r2)
 	q3 := p3 + (q1 - p1) + (q2 - p2)
